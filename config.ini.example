@@ -1,0 +1,18 @@
+; Скопируйте этот файл в config.ini и заполните реальными данными.
+; config.ini в .gitignore и не должен попадать в репозиторий.
+
+[default]
+host = localhost
+user = root
+password = 123456
+database = rksi_test
+charset = utf8mb4
+
+; Можно добавить сколько угодно секций для разных БД,
+; и выбирать нужную через: python guard.py --db <имя_секции>
+[another_db]
+host = localhost
+user = root
+password = secret
+database = another_db
+charset = utf8mb4

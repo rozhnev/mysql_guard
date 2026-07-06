@@ -11,11 +11,28 @@
 git clone https://github.com
 cd mysql_guard
 pip install pymysql
+cp config.ini.example config.ini
 ```
 
-Настройка подключений правится внутри `guard.py` в блоке `DB_CONFIG`. Запуск контроля:
+Настройка подключений хранится в `config.ini` (не попадает в git). Каждая секция файла — это отдельная БД:
+
+```ini
+[default]
+host = localhost
+user = root
+password = 123456
+database = rksi_test
+charset = utf8mb4
+```
+
+Запуск контроля (используется секция `default` по умолчанию):
 ```bash
 python guard.py
+```
+
+Выбор другой БД по имени секции:
+```bash
+python guard.py --db another_db
 ```
 
 ---
@@ -33,9 +50,26 @@ Automated schema linter and architecture auditor designed for MySQL databases. I
 git clone https://github.com
 cd mysql_guard
 pip install pymysql
+cp config.ini.example config.ini
 ```
 
-Configure target connection parameters in `guard.py` inside the `DB_CONFIG` section. Run the audit:
+Connection parameters live in `config.ini` (git-ignored). Each section is a separate database:
+
+```ini
+[default]
+host = localhost
+user = root
+password = 123456
+database = rksi_test
+charset = utf8mb4
+```
+
+Run the audit (uses the `default` section by default):
 ```bash
 python guard.py
+```
+
+Target a different database by section name:
+```bash
+python guard.py --db another_db
 ```

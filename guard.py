@@ -1,23 +1,39 @@
+import argparse
+import configparser
+import os
 import pymysql
 import sys
 
-# Тимлид меняет эти данные под свою тестовую базу.
-DB_CONFIG = {
-    "host": "localhost",
-    "user": "root",
-    "password": "123456",
-    "database": "rksi_test",
-    "charset": "utf8mb4"
-}
+CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.ini")
+DEFAULT_DB = "default"
 
-def run_schema_audit():
+
+def load_db_config(db_name):
+    if not os.path.exists(CONFIG_PATH):
+        print(f"[CRITICAL ERROR] Файл конфигурации не найден: {CONFIG_PATH}")
+        print("Скопируйте config.ini.example в config.ini и укажите свои данные подключения.")
+        sys.exit(1)
+
+    parser = configparser.ConfigParser()
+    parser.read(CONFIG_PATH)
+
+    if not parser.has_section(db_name):
+        print(f"[CRITICAL ERROR] Секция '[{db_name}]' не найдена в {CONFIG_PATH}")
+        sys.exit(1)
+
+    return dict(parser.items(db_name))
+
+
+def run_schema_audit(db_name):
     print("=" * 60)
     print(" STARTING DATABASE ARCHITECTURE AUDIT [MYSQL_GUARD]")
     print("=" * 60)
-    
+
+    db_config = load_db_config(db_name)
+
     try:
         # Подключаемся к СУБД через библиотеку
-        connection = pymysql.connect(**DB_CONFIG)
+        connection = pymysql.connect(**db_config)
     except Exception as e:
         print(f"[CRITICAL ERROR] Подключение к MySQL не удалось: {e}")
         sys.exit(1)
@@ -95,4 +111,11 @@ def run_schema_audit():
         print("=" * 60)
 
 if __name__ == "__main__":
-    run_schema_audit()
+    arg_parser = argparse.ArgumentParser(description="MySQL Guard — аудитор архитектуры схемы БД")
+    arg_parser.add_argument(
+        "--db",
+        default=DEFAULT_DB,
+        help=f"Имя секции подключения из config.ini (по умолчанию: {DEFAULT_DB})",
+    )
+    args = arg_parser.parse_args()
+    run_schema_audit(args.db)
